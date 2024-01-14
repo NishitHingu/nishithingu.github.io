@@ -96,8 +96,4 @@ const Footer = () => {
   );
 };
 
-Footer.propTypes = {
-  githubInfo: PropTypes.object,
-};
-
 export default Footer;

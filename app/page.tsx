@@ -1,20 +1,80 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
-import styled from 'styled-components';
-import { GlobalStyle, theme } from '@/app/styles';
-import Loader from '@/app/components/loader';
-import Nav from '@/app/components/nav';
-import Social from '@/app/components/social';
-import Email from '@/app/components/email';
-import Footer from './components/footer';
-import Hero from './components/sections/hero';
-import About from './components/sections/about';
-import Jobs from './components/sections/jobs';
-import Featured from './components/sections/featured';
-import Projects from './components/sections/projects';
-import Contact from './components/sections/contact';
+import React, { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
+import styled from "styled-components";
+import { GlobalStyle, theme } from "@/app/styles";
+
+// pages/index.js
+import dynamic from "next/dynamic";
+
+const DynamicComponentLoader = dynamic(
+  () => import("@/app/components/loader"),
+  {
+    ssr: false,
+  }
+);
+const DynamicComponentNav = dynamic(
+  () => import("@/app/components/nav"),
+  {
+    ssr: false,
+  }
+);
+const DynamicComponentSocial = dynamic(
+  () => import("@/app/components/social"),
+  {
+    ssr: false,
+  }
+);
+const DynamicComponentEmail = dynamic(
+  () => import("@/app/components/email"),
+  {
+    ssr: false,
+  }
+);
+const DynamicComponentFooter = dynamic(
+  () => import("@/app/components/footer"),
+  {
+    ssr: false,
+  }
+);
+const DynamicComponentHero = dynamic(
+  () => import("@/app/components/sections/hero"),
+  {
+    ssr: false,
+  }
+);
+
+const DynamicComponentAbout = dynamic(
+  () => import("@/app/components/sections/about"),
+  {
+    ssr: false,
+  }
+);
+const DynamicComponentJobs = dynamic(
+  () => import("@/app/components/sections/jobs"),
+  {
+    ssr: false,
+  }
+);
+const DynamicComponentFeatured = dynamic(
+  () => import("@/app/components/sections/featured"),
+  {
+    ssr: false,
+  }
+);
+const DynamicComponentProjects = dynamic(
+  () => import("@/app/components/sections/projects"),
+  {
+    ssr: false,
+  }
+);
+const DynamicComponentContact = dynamic(
+  () => import("@/app/components/sections/contact"),
+  {
+    ssr: false,
+  }
+);
 
 const { colors, fontSizes, fonts } = theme;
 
@@ -54,50 +114,50 @@ const StyledContent = styled.div`
 `;
 
 export default function Home() {
-    const isHome = usePathname() === '/';
-    const [isLoading, setIsLoading] = useState(true);
-  
-    useEffect(() => {
-      if (isLoading) {
-        return;
-      }
-      if (location.hash) {
-        const id = location.hash.substring(1); // location.hash without the '#'
-        setTimeout(() => {
-          const el = document.getElementById(id);
-          if (el) {
-            el.scrollIntoView();
-            el.focus();
-          }
-        }, 0);
-      }
-    }, [isLoading]);
+  const isHome = usePathname() === "/";
+  const [isLoading, setIsLoading] = useState(true);
 
-    return (
-      <div id="root">
-          <GlobalStyle />
+  useEffect(() => {
+    if (isLoading) {
+      return;
+    }
+    if (location.hash) {
+      const id = location.hash.substring(1); // location.hash without the '#'
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView();
+          el.focus();
+        }
+      }, 0);
+    }
+  }, [isLoading]);
 
-          <SkipToContent href="#content">Skip to Content</SkipToContent>
+  return (
+    <div id="root">
+      <GlobalStyle />
 
-          {isLoading && isHome ? (
-            <Loader finishLoading={() => setIsLoading(false)} />
-          ) : (
-            <StyledContent>
-              <Nav isHome={isHome} />
-              <Social isHome={isHome} />
-              <Email isHome={isHome} />
+      <SkipToContent href="#content">Skip to Content</SkipToContent>
 
-              <div id="content">
-                <Hero />
-                <About />
-                <Jobs />
-                <Featured />
-                <Projects />
-                <Contact/>
-                <Footer />
-              </div>
-            </StyledContent>
-          )}
-        </div>
-    )
+      {isLoading && isHome ? (
+        <DynamicComponentLoader finishLoading={() => setIsLoading(false)} />
+      ) : (
+        <StyledContent>
+          <DynamicComponentNav isHome={isHome} />
+          <DynamicComponentSocial isHome={isHome} />
+          <DynamicComponentEmail isHome={isHome} />
+
+          <div id="content">
+            <DynamicComponentHero />
+            <DynamicComponentAbout />
+            <DynamicComponentJobs />
+            <DynamicComponentFeatured />
+            <DynamicComponentProjects />
+            <DynamicComponentContact />
+            <DynamicComponentFooter />
+          </div>
+        </StyledContent>
+      )}
+    </div>
+  );
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import sr from '@/app/utils/sr';
+import ScrollReveal from 'scrollreveal';
 import { Data, jobsProps } from '@/app/config';
 import styled from 'styled-components';
 import { theme, mixins, media as media_, Section, Heading } from '@/app/styles';
@@ -171,7 +171,12 @@ const Jobs = () => {
   const data = Data.jobs.data;
 
   const revealContainer = useRef(null);
-  useEffect(() => sr.reveal(revealContainer.current, Data.srConfig()), []);
+  useEffect(() => {
+    if (typeof window !== 'undefined' && revealContainer.current !== null)
+    {
+      ScrollReveal().reveal(revealContainer.current, Data.srConfig())
+    }
+  }, []);
 
   const focusTab = () => {
     if (tabFocus != null)

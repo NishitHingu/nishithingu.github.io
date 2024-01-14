@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, MutableRefObject } from 'react';
 import Link from 'next/link';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import sr from '@/app/utils/sr';
+import ScrollReveal from 'scrollreveal';
 import { Data } from '@/app/config';
 import { FormattedIcon } from '@/app/icons';
 import styled from 'styled-components';
@@ -133,8 +133,11 @@ const Projects = () => {
   const revealProjects: MutableRefObject<HTMLDivElement[]> | null[] = useRef([]);
 
   useEffect(() => {
-    sr.reveal(revealTitle.current, Data.srConfig());
-    revealProjects.current.forEach((ref, i) => sr.reveal(ref, Data.srConfig(i * 100)));
+    if (typeof window !== 'undefined' && revealTitle.current !== null)
+    {
+      ScrollReveal().reveal(revealTitle.current, Data.srConfig());
+      revealProjects.current.forEach((ref, i) => ScrollReveal().reveal(ref, Data.srConfig(i * 100)));
+    }
   }, []);
 
   const GRID_LIMIT = 6;

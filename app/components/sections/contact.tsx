@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import PropTypes from 'prop-types';
-import sr from '@/app/utils/sr';
+import ScrollReveal from 'scrollreveal';
 import { Data } from '@/app/config';
 import styled from 'styled-components';
 import { theme, mixins, media as media_, Section, Heading } from '@/app/styles';
@@ -38,7 +37,12 @@ const StyledEmailLink = styled.a`
 
 const Contact = () => {
   const revealContainer = useRef(null);
-  useEffect(() => sr.reveal(revealContainer.current, Data.srConfig()), []);
+  useEffect(() => {
+    if (typeof window !== 'undefined' && revealContainer.current !== null)
+    {
+        ScrollReveal().reveal(revealContainer.current, Data.srConfig())
+    }
+  }, []);
 
   return (
     <StyledContainer id="contact" ref={revealContainer}>

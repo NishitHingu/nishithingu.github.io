@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useEffect, useRef, useState } from 'react';
 import Helmet from 'react-helmet';
 import PropTypes from 'prop-types';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -56,12 +56,12 @@ const StyledLogo = styled.div`
   ${mixins.flexCenter};
   a {
     display: block;
-    color: ${colors.green};
     width: 42px;
     height: 42px;
     &:hover,
     &:focus {
       svg {
+        fill: none;
         fill: ${colors.transGreen};
       }
     }
@@ -169,155 +169,164 @@ interface PropsInterface {
   isHome: boolean;
 }
 
-class Nav extends Component<PropsInterface> {
-  state = {
-    isMounted: !this.props.isHome,
-    menuOpen: false,
-    scrollDirection: 'none',
-    lastScrollTop: 0,
-  };
+export default function Nav ({isHome} : {isHome: boolean}) {
+  const [isMounted, setIsMounted] = useState(isHome);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrollDirection, setScrollDirection] = useState('none');
+  const lastScrollTop = useRef(0);
 
-  componentDidMount() {
-    setTimeout(
-      () =>
-        this.setState({ isMounted: true }, () => {
-          window.addEventListener('scroll', () => throttle(this.handleScroll()));
-          window.addEventListener('resize', () => throttle(this.handleResize()));
-          window.addEventListener('keydown', e => this.handleKeydown(e));
-        }),
-      100,
-    );
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
   }
 
-  componentWillUnmount() {
-    window.removeEventListener('scroll', () => this.handleScroll());
-    window.removeEventListener('resize', () => this.handleResize());
-    window.removeEventListener('keydown', e => this.handleKeydown(e));
-  }
-
-  toggleMenu = () => this.setState({ menuOpen: !this.state.menuOpen });
-
-  handleScroll = () => {
-    const { isMounted, menuOpen, scrollDirection, lastScrollTop } = this.state;
-    const fromTop = window.scrollY;
-
-    // Make sure they scroll more than DELTA
-    if (!isMounted || Math.abs(lastScrollTop - fromTop) <= DELTA || menuOpen) {
-      return;
-    }
-
-    if (fromTop < DELTA) {
-      this.setState({ scrollDirection: 'none' });
-    } else if (fromTop > lastScrollTop && fromTop > Data.navHeight) {
-      if (scrollDirection !== 'down') {
-        this.setState({ scrollDirection: 'down' });
+  const handleScroll = () => {
+    if (typeof window !== 'undefined')
+    {
+      const fromTop = window.scrollY;
+      // Make sure they scroll more than DELTA
+      if (!isMounted || Math.abs(lastScrollTop.current - fromTop) <= DELTA || menuOpen) {
+        return;
       }
-    } else if (fromTop + window.innerHeight < document.body.scrollHeight) {
-      if (scrollDirection !== 'up') {
-        this.setState({ scrollDirection: 'up' });
+
+      if (fromTop < DELTA) {
+        setScrollDirection('none');
+      } else if (fromTop > lastScrollTop.current && fromTop > Data.navHeight) {
+        if (scrollDirection !== 'down') {
+          setScrollDirection('down');
+        }
+      } else if (fromTop + window.innerHeight < document.body.scrollHeight) {
+        if (scrollDirection !== 'up') {
+          setScrollDirection('up');
+        }
       }
-    }
 
-    this.setState({ lastScrollTop: fromTop });
-  };
-
-  handleResize = () => {
-    if (window.innerWidth > 768 && this.state.menuOpen) {
-      this.toggleMenu();
+      lastScrollTop.current = fromTop;
     }
   };
 
-  handleKeydown = (e: any) => {
-    if (!this.state.menuOpen) {
+  const handleResize = () => {
+    if (typeof window !== 'undefined')
+    {
+      if (window.innerWidth > 768 && menuOpen) {
+        toggleMenu();
+      }
+    }
+  };
+
+  const handleKeydown = (e: any) => {
+    if (!menuOpen) {
       return;
     }
 
     if (e.which === 27 || e.key === 'Escape') {
-      this.toggleMenu();
+      toggleMenu();
     }
   };
 
-  render() {
-    const { isMounted, menuOpen, scrollDirection } = this.state;
-    const { isHome } = this.props;
-    const timeout = isHome ? loaderDelay : 0;
-    const fadeClass = isHome ? 'fade' : '';
-    const fadeDownClass = isHome ? 'fadedown' : '';
-
-    return (
-      <StyledContainer scrollDirection={scrollDirection}>
-        <Helmet>
-          <body className={menuOpen ? 'blur' : ''} />
-        </Helmet>
-        <StyledNav>
-          <TransitionGroup component={null}>
-            {isMounted && (
-              <CSSTransition classNames={fadeClass} timeout={timeout}>
-                <StyledLogo>
-                  {isHome ? (
-                    <a href="/" aria-label="home">
-                      <IconLogo />
-                    </a>
-                  ) : (
-                    <Link href="/" aria-label="home">
-                      <IconLogo />
-                    </Link>
-                  )}
-                </StyledLogo>
-              </CSSTransition>
-            )}
-          </TransitionGroup>
-
-          <TransitionGroup component={null}>
-            {isMounted && (
-              <CSSTransition classNames={fadeClass} timeout={timeout}>
-                <StyledHamburger onClick={this.toggleMenu}>
-                  <StyledHamburgerBox>
-                    <StyledHamburgerInner menuOpen={menuOpen} />
-                  </StyledHamburgerBox>
-                </StyledHamburger>
-              </CSSTransition>
-            )}
-          </TransitionGroup>
-
-          <StyledLink>
-            <StyledList>
-              <TransitionGroup component={null}>
-                {isMounted &&
-                  Data.navLinks &&
-                  Data.navLinks.map(({ url, name }, i) => (
-                    <CSSTransition key={i} classNames={fadeDownClass} timeout={timeout}>
-                      <StyledListItem
-                        key={i}
-                        style={{ transitionDelay: `${isHome ? i * 100 : 0}ms` }}>
-                        <StyledListLink href={url}>{name}</StyledListLink>
-                      </StyledListItem>
-                    </CSSTransition>
-                  ))}
-              </TransitionGroup>
-            </StyledList>
-
-            <TransitionGroup component={null}>
-              {isMounted && (
-                <CSSTransition classNames={fadeDownClass} timeout={timeout}>
-                  <div style={{ transitionDelay: `${isHome ? Data.navLinks.length * 100 : 0}ms` }}>
-                    <StyledResumeButton
-                      href={Data.resume}
-                      target="_blank"
-                      rel="nofollow noopener noreferrer">
-                      Resume
-                    </StyledResumeButton>
-                  </div>
-                </CSSTransition>
-              )}
-            </TransitionGroup>
-          </StyledLink>
-        </StyledNav>
-
-        <Menu menuOpen={menuOpen} toggleMenu={this.toggleMenu} />
-      </StyledContainer>
-    );
+  const RemoveListeners = () => {
+    if (typeof window !== 'undefined')
+    {
+      window.removeEventListener('scroll', () => handleScroll());
+      window.removeEventListener('resize', () => handleResize());
+      window.removeEventListener('keydown', e => handleKeydown(e));
+    }
   }
-}
 
-export default Nav;
+  useEffect(() => {
+    setTimeout(
+      () =>
+        {
+          setIsMounted(true);
+          if (typeof window !== 'undefined')
+          {
+            window.addEventListener('scroll', () => handleScroll());
+            window.addEventListener('resize', () => handleResize());
+            window.addEventListener('keydown', e => handleKeydown(e));
+          }
+        },
+      100,
+    )
+
+    return () => {
+      RemoveListeners();
+    }
+  }, []);
+
+  const timeout = isHome ? loaderDelay : 0;
+  const fadeClass = isHome ? 'fade' : '';
+  const fadeDownClass = isHome ? 'fadedown' : '';
+  
+  return (
+    <StyledContainer scrollDirection={scrollDirection}>
+      <Helmet>
+        <body className={menuOpen ? 'blur' : ''} />
+      </Helmet>
+      <StyledNav>
+        <TransitionGroup component={null}>
+          {isMounted && (
+            <CSSTransition classNames={fadeClass} timeout={timeout}>
+              <StyledLogo>
+                {isHome ? (
+                  <a href="/" aria-label="home">
+                    <IconLogo />
+                  </a>
+                ) : (
+                  <Link href="/" aria-label="home">
+                    <IconLogo />
+                  </Link>
+                )}
+              </StyledLogo>
+            </CSSTransition>
+          )}
+        </TransitionGroup>
+
+        <TransitionGroup component={null}>
+          {isMounted && (
+            <CSSTransition classNames={fadeClass} timeout={timeout}>
+              <StyledHamburger onClick={toggleMenu}>
+                <StyledHamburgerBox>
+                  <StyledHamburgerInner menuOpen={menuOpen} />
+                </StyledHamburgerBox>
+              </StyledHamburger>
+            </CSSTransition>
+          )}
+        </TransitionGroup>
+
+        <StyledLink>
+          <StyledList>
+            <TransitionGroup component={null}>
+              {isMounted &&
+                Data.navLinks &&
+                Data.navLinks.map(({ url, name }, i) => (
+                  <CSSTransition key={i} classNames={fadeDownClass} timeout={timeout}>
+                    <StyledListItem
+                      key={i}
+                      style={{ transitionDelay: `${isHome ? i * 100 : 0}ms` }}>
+                      <StyledListLink href={url}>{name}</StyledListLink>
+                    </StyledListItem>
+                  </CSSTransition>
+                ))}
+            </TransitionGroup>
+          </StyledList>
+
+          <TransitionGroup component={null}>
+            {isMounted && (
+              <CSSTransition classNames={fadeDownClass} timeout={timeout}>
+                <div style={{ transitionDelay: `${isHome ? Data.navLinks.length * 100 : 0}ms` }}>
+                  <StyledResumeButton
+                    href={Data.resume}
+                    target="_blank"
+                    rel="nofollow noopener noreferrer">
+                    Resume
+                  </StyledResumeButton>
+                </div>
+              </CSSTransition>
+            )}
+          </TransitionGroup>
+        </StyledLink>
+      </StyledNav>
+
+      <Menu menuOpen={menuOpen} toggleMenu={toggleMenu}/>
+    </StyledContainer>
+  );
+}

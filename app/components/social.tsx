@@ -61,8 +61,4 @@ const Social = ({ isHome }: {isHome: boolean}) => (
   </Side>
 );
 
-Social.propTypes = {
-  isHome: PropTypes.bool,
-};
-
 export default Social;

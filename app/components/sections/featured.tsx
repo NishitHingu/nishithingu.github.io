@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Image from 'next/image';
-import sr from '@/app/utils/sr';
+import ScrollReveal from 'scrollreveal';
 import { Data, featuredProjectsProps } from '@/app/config';
 import { FormattedIcon } from '@/app/icons';
 import styled from 'styled-components';
@@ -214,8 +214,11 @@ const Featured = () => {
   const revealTitle = useRef(null);
   const revealProjects: any = useRef([]);
   useEffect(() => {
-    sr.reveal(revealTitle.current, Data.srConfig());
-    revealProjects.current.forEach((ref: any, i: number) => sr.reveal(ref, Data.srConfig(i * 100)));
+    if (typeof window !== 'undefined' && revealTitle.current !== null)
+    {
+      ScrollReveal().reveal(revealTitle.current, Data.srConfig());
+      revealProjects.current.forEach((ref: any, i: number) => ScrollReveal().reveal(ref, Data.srConfig(i * 100)));
+    }
   }, []);
 
   return (

@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from 'react';
-import Image from 'next/image';
-import sr from '@/app/utils/sr';
-import { Data } from '@/app/config';
-import styled from 'styled-components';
-import { theme, mixins, media as media_, Section, Heading } from '@/app/styles';
+import React, { useEffect, useRef } from "react";
+import Image from "next/image";
+import ScrollReveal from 'scrollreveal';
+import { Data } from "@/app/config";
+import styled from "styled-components";
+import { theme, mixins, media as media_, Section, Heading } from "@/app/styles";
 const { colors, fontSizes, fonts } = theme;
 
 let media: any = media_;
@@ -40,7 +40,7 @@ const Skill = styled.li`
   font-size: ${fontSizes.smish};
   color: ${colors.green};
   &:before {
-    content: '▹';
+    content: "▹";
     position: absolute;
     left: 0;
     color: ${colors.green};
@@ -64,7 +64,7 @@ const StyledPic = styled.div`
 
 const StyledAvatar = styled(Image)`
   position: relative;
-//   mix-blend-mode: multiply;
+  //   mix-blend-mode: multiply;
   filter: grayscale(30%) contrast(1);
   border-radius: ${theme.borderRadius};
   transition: ${theme.transition};
@@ -91,7 +91,7 @@ const StyledAvatarLink = styled.a`
   }
   &:before,
   &:after {
-    content: '';
+    content: "";
     display: block;
     position: absolute;
     width: 100%;
@@ -117,7 +117,12 @@ const StyledAvatarLink = styled.a`
 
 const About = ({}) => {
   const revealContainer = useRef(null);
-  useEffect(() => sr.reveal(revealContainer.current, Data.srConfig()), []);
+  useEffect(() => {
+    if (typeof window !== 'undefined' && revealContainer.current !== null)
+    {
+      ScrollReveal().reveal(revealContainer.current, Data.srConfig())
+    }
+  }, []);
 
   return (
     <StyledContainer id="about" ref={revealContainer}>
@@ -126,12 +131,20 @@ const About = ({}) => {
         <StyledContent>
           <div dangerouslySetInnerHTML={{ __html: Data.about.html }} />
           <SkillsContainer>
-            {Data.about.skills && Data.about.skills.map((skill, i) => <Skill key={i}>{skill}</Skill>)}
+            {Data.about.skills &&
+              Data.about.skills.map((skill, i) => (
+                <Skill key={i}>{skill}</Skill>
+              ))}
           </SkillsContainer>
         </StyledContent>
         <StyledPic>
           <StyledAvatarLink href={Data.github}>
-            <StyledAvatar src={Data.about.img.src} width={Data.about.img.width} height={Data.about.img.height} alt="Picture of creater" />
+            <StyledAvatar
+              src={Data.about.img.src}
+              width={Data.about.img.width}
+              height={Data.about.img.height}
+              alt="Picture of creater"
+            />
           </StyledAvatarLink>
         </StyledPic>
       </StyledFlexContainer>
