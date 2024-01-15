@@ -9,8 +9,7 @@
     "predeploy": "next build",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "export": "next export"
+    "lint": "next lint"
   },
   "dependencies": {
     "@types/animejs": "^3.1.12",

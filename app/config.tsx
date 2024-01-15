@@ -37,7 +37,7 @@ export let Data = {
   location: "Mumbai, India",
   email: "nishithingu@gmail.com",
   github: "https://github.com/NishitHingu",
-  resume: "/Resume.pdf",
+  resume: "./Resume.pdf",
   twitterHandle: "@",
   hero: {
     greetings: "Namaste, my name is",
