@@ -133,14 +133,21 @@ export default function Home() {
     }
   }, [isLoading]);
 
+  useEffect(() => {
+    // const timeout = setTimeout(() => setIsLoading(false), 5);
+    // return () => clearTimeout(timeout);
+    setIsLoading(false);
+  }, []);
+
   return (
     <div id="root">
       <GlobalStyle />
 
-      <SkipToContent href="#content">Skip to Content</SkipToContent>
+      {/* <SkipToContent href="#content">Skip to Content</SkipToContent> */}
 
       {isLoading && isHome ? (
-        <DynamicComponentLoader finishLoading={() => setIsLoading(false)} />
+        // <DynamicComponentLoader finishLoading={() => setIsLoading(false)} />
+        <></>
       ) : (
         <StyledContent>
           <DynamicComponentNav isHome={isHome} />
